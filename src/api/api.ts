@@ -18,10 +18,12 @@ api.interceptors.request.use((config) => {
 });
 
 export const register = (username: string, password: string, role: string) => {
+  console.log('Sending registration request to:', `${API_URL}/register`);
   return api.post('/register', { username, password, role });
 };
 
 export const login = (username: string, password: string) => {
+  console.log('Sending login request to:', `${API_URL}/login`);
   return api.post('/login', { username, password });
 };
 
