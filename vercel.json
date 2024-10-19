@@ -1,10 +1,8 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://procco-backend.onrender.com/api/$1"
+      "destination": "https://procco-backend.onrender.com/$1"
     },
     {
       "source": "/(.*)",
