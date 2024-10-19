@@ -3,20 +3,26 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { UserCircle, Briefcase, LogIn } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { login } from '../api/api';
 
 const SignIn: React.FC = () => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<'buyer' | 'seller'>('buyer');
-  const { setUser } = useAuth();
+  const [error, setError] = useState('');
+  const { login: authLogin } = useAuth();
   const navigate = useNavigate();
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real application, you would validate the credentials here
-    const newUser = { id: Date.now().toString(), name: email.split('@')[0], role, email };
-    setUser(newUser);
-    navigate('/');
+    setError('');
+    try {
+      const response = await login(username, password);
+      authLogin(response.data.token, response.data.user);
+      navigate('/');
+    } catch (error) {
+      console.error('Error signing in:', error);
+      setError('Invalid username or password');
+    }
   };
 
   return (
@@ -31,21 +37,21 @@ const SignIn: React.FC = () => {
           <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
             Kirjaudu sisään Proccoon
           </h2>
+          {error && <p className="text-red-500 mb-4">{error}</p>}
           <form onSubmit={handleSignIn} className="space-y-4">
             <div>
-              <label htmlFor="email-address" className="block text-sm font-medium text-gray-700 mb-1">
-                Sähköpostiosoite
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                Käyttäjänimi
               </label>
               <input
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
+                id="username"
+                name="username"
+                type="text"
                 required
                 className="input w-full"
-                placeholder="Sähköpostiosoite"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Käyttäjänimi"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
             <div>
@@ -56,40 +62,12 @@ const SignIn: React.FC = () => {
                 id="password"
                 name="password"
                 type="password"
-                autoComplete="current-password"
                 required
                 className="input w-full"
                 placeholder="Salasana"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-            </div>
-
-            <div className="flex items-center justify-center space-x-4">
-              <button
-                type="button"
-                className={`flex-1 py-2 px-4 rounded-md focus:outline-none transition-colors ${
-                  role === 'buyer'
-                    ? 'bg-green-500 text-white hover:bg-green-600'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-                onClick={() => setRole('buyer')}
-              >
-                <UserCircle className="inline-block mr-2" />
-                Ostaja
-              </button>
-              <button
-                type="button"
-                className={`flex-1 py-2 px-4 rounded-md focus:outline-none transition-colors ${
-                  role === 'seller'
-                    ? 'bg-green-500 text-white hover:bg-green-600'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-                onClick={() => setRole('seller')}
-              >
-                <Briefcase className="inline-block mr-2" />
-                Myyjä
-              </button>
             </div>
 
             <button
