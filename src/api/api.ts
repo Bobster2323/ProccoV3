@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -9,21 +9,15 @@ const api = axios.create({
   },
 });
 
-// Add a request interceptor to include the JWT token in requests
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-);
+  return config;
+});
 
-export const register = (username: string, password: string, role: 'buyer' | 'seller') => {
+export const register = (username: string, password: string, role: string) => {
   return api.post('/register', { username, password, role });
 };
 
@@ -37,14 +31,6 @@ export const submitServiceRequest = (serviceRequest: any) => {
 
 export const getServiceRequests = () => {
   return api.get('/service-requests');
-};
-
-export const submitOffer = (offer: any) => {
-  return api.post('/offer', offer);
-};
-
-export const getOffers = (requestId: number) => {
-  return api.get(`/offers/${requestId}`);
 };
 
 export default api;
