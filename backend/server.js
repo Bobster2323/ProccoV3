@@ -11,9 +11,12 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Configure CORS to allow requests from your frontend
+// Configure CORS to allow multiple frontend URLs
 const corsOptions = {
-  origin: 'https://procco-v3.vercel.app', // Replace with your frontend's URL
+  origin: [
+    'https://procco-v3.vercel.app',  // Production URL
+    'https://procco-v3-git-main-robs-projects-64ae1c07.vercel.app' // Git deployment URL
+  ],
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
