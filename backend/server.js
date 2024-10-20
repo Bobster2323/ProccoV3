@@ -55,6 +55,32 @@ app.post('/register', async (req, res) => {
   }
 });
 
+// User Login Route
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    // Check if the user exists
+    const user = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+    if (user.rows.length === 0) {
+      return res.status(400).json({ message: 'Invalid username or password' });
+    }
+
+    // Compare the provided password with the stored hashed password
+    const validPassword = await bcrypt.compare(password, user.rows[0].password);
+    if (!validPassword) {
+      return res.status(400).json({ message: 'Invalid username or password' });
+    }
+
+    // Create and send a JWT token
+    const token = jwt.sign({ username: user.rows[0].username, role: user.rows[0].role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.status(200).json({ message: 'Login successful', token });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: 'Error logging in' });
+  }
+});
+
 // Example route to test the server
 app.get('/', (req, res) => {
   res.send('Procco Backend is running!');
