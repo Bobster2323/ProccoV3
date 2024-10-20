@@ -17,6 +17,11 @@ const SignIn: React.FC = () => {
     setError('');
     try {
       const response = await login(username, password);
+
+      // Store the JWT token in localStorage
+      localStorage.setItem('token', response.data.token);
+
+      // Authenticate the user in your context and navigate
       authLogin(response.data.token, response.data.user);
       navigate('/');
     } catch (error) {
